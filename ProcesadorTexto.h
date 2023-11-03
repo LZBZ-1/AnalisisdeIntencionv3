@@ -22,8 +22,9 @@ using namespace std;
 class ProcesadorTexto {
 private:
     int cont;
-    u32string textoPreProcesado;
+    u32string textoProcesado;
     vector<u32string> stopwords;
+    string textoPostProcesado;
 
     bool is_in_u32string(char32_t c, const u32string& str) {
         return str.find(c) != string::npos;
@@ -42,6 +43,7 @@ private:
 
         while (true){
             c = archive[cont];
+            c = towlower(c);
             if(is_in_u32string(c, U" \n\t\r,.\"\'")) break;
             if(bandera) {
                 bandera = iswalpha(c);
@@ -59,11 +61,21 @@ private:
                 const unsigned char* stemmed_word = sb_stemmer_stem(stemmer, reinterpret_cast<const sb_symbol *>(word), strlen(word));
                 string palabra_stemmed(reinterpret_cast<const char*>(stemmed_word));
                 sb_stemmer_delete(stemmer);
-                textoPreProcesado += to_u32string(palabra_stemmed);
-                textoPreProcesado += U" ";
+                textoProcesado += to_u32string(palabra_stemmed);
+                textoProcesado += U" ";
             }
         }
     }
+
+    string quitarTilde(char32_t c) {
+        if (c == U'á') return "a";
+        else if (c == U'é') return "e";
+        else if (c == U'í') return "i";
+        else if (c == U'ó') return "o";
+        else if (c == U'ú' || c == U'ü') return "u";
+        else return "nh";
+    }
+
 public:
     ProcesadorTexto() {
         basic_ifstream<char32_t> fin("data/stopwordsOrdened.txt");
@@ -76,21 +88,46 @@ public:
 
     }
 
-    u32string preProcesarTexto(const u32string& archive) {
+    u32string ProcesarTexto(const u32string& archive) {
         char32_t c;
         cont = 0;
         while (cont < archive.size()) {
             c = archive[cont];
-            c = towlower(c);
             if(iswalpha(c)) {
                 identifyU32Word(archive);
+            } else if (is_in_u32string(c, U" \n\t\r") || is_in_u32string(textoProcesado[cont - 1], U" \n\t\r")) {
+                cont++;
             } else {
-                textoPreProcesado += c;
+                textoProcesado += c;
                 cont++;
             }
         }
 
-        return textoPreProcesado;
+        return textoProcesado;
+    }
+
+    string PostProcesado(u32string archive) {
+        if(textoProcesado.empty()) {
+            textoProcesado = ProcesarTexto(archive);
+        }
+
+        char32_t c;
+        char c_transformed;
+        cont = 0;
+
+        while (cont < textoProcesado.size()) {
+            c = textoProcesado[cont];
+
+            if(is_in_u32string(c, U"áéíóúüñ")) {
+                string transform = quitarTilde(c);
+                textoPostProcesado += transform;
+            } else {
+                c_transformed = (char) c;
+                textoPostProcesado += c_transformed;
+            }
+            cont++;
+        }
+        return textoPostProcesado;
     }
 };
 

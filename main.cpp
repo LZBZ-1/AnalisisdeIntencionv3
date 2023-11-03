@@ -18,11 +18,14 @@ int main() {
     ProcesadorTexto PC;
     setlocale(LC_ALL, "es_ES.UTF-8");
     u32string archive = readFile("text.txt");
-    u32string textoPreProcesado = PC.preProcesarTexto(archive);
+    u32string textoProcesado = PC.ProcesarTexto(archive);
+    string textoPostProcesado = PC.PostProcesado(archive);
     wstring_convert<codecvt_utf8<char32_t>, char32_t> converter;
     cout << converter.to_bytes (archive) << endl;
     cout << "-------------------------" << endl;
-    cout << converter.to_bytes(textoPreProcesado) << endl;
+    cout << converter.to_bytes(textoProcesado) << endl;
+    cout << "-------------------------" << endl;
+    cout << textoPostProcesado << endl;
 
     return 0;
 }
