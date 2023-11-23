@@ -6,6 +6,7 @@
 #include "ProcesadorTexto.h"
 #include "Flex.h"
 #include "Bison.h"
+#include "AnalisisIntencion.h"
 
 using namespace std;
 
@@ -56,6 +57,7 @@ int main() {
     ProcesadorTexto PC;
     Flex flex;
     Bison bison;
+    AnalisisIntencion AI;
     setlocale(LC_ALL, "es_ES.UTF-8");
     u32string archive = readFile("file.txt");
     u32string textoProcesado = PC.ProcesarTexto(archive);
@@ -73,6 +75,21 @@ int main() {
     flex.excecuteFlex();
     excecuteParser();
     excecuteProgram();
+
+    int intencion = AI.getIntencionTexto();
+    switch (intencion) {
+        case 262:
+            cout << "La intencion del texto es CONTAR UNA HISTORIA" << endl;
+            break;
+        case 263:
+            cout << "La intencion del texto es INFORMAR" << endl;
+            break;
+        case 264: cout << "La intencion del texto es DESCRIBIR" << endl;
+            break;
+        case 265: cout << "La intencion del texto es CONVENCER" << endl;
+            break;
+        default: cout << "NO SE PUDO OBTENER LA INTENCION DEL TEXTO" << endl;
+    }
 
     return 0;
 }

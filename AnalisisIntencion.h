@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <map>
 
 using namespace std;
 
@@ -34,7 +35,25 @@ private:
     }
 public:
     AnalisisIntencion() {
+        tokens = cargarData("output.txt");
+    }
 
+    int getIntencionTexto() {
+        map<int, int> recuento;
+
+        for (int numero : tokens) {
+            recuento[numero]++;
+        }
+
+        int maxRecuento = -1;
+
+        for (const auto& par : recuento) {
+            if (par.second > maxRecuento && (par.first > 200 && par.first != 258)) {
+                maxRecuento = par.first;
+            }
+        }
+
+        return maxRecuento;
     }
 };
 #endif //ANALISISDEINTENCIONV3_ANALISISINTENCION_H

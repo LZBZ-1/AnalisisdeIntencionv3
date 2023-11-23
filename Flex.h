@@ -34,6 +34,8 @@ private:
     }
 
 
+
+
 public:
     Flex() {
         INFOMAR = cargarData("data/infomar.txt");
