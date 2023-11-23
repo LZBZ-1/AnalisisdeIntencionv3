@@ -58,4 +58,6 @@ add_executable(AnalisisdeIntencionv3 main.cpp
         libstemmer_c/runtime/utilities.c
         ProcesadorTexto.h
         utils.h
+        Flex.h
+        Bison.h
 )

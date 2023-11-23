@@ -44,7 +44,7 @@ private:
         while (true){
             c = archive[cont];
             c = towlower(c);
-            if(is_in_u32string(c, U" \n\t\r,.\"\'")) break;
+            if(is_in_u32string(c, U" \n\t\r,.\"\'()¡¿!?")) break;
             if(bandera) {
                 bandera = iswalpha(c);
             }
@@ -76,6 +76,37 @@ private:
         else return "nh";
     }
 
+    char replaceSimbols(char32_t c) {
+        if (c == U'¿') {
+            return  '?';
+        } else {
+            return '!';
+        }
+    }
+
+    void crearArchivoProcesado() {
+        // Verificar si el archivo existe
+        FILE* archivo = fopen("archive.c", "r");
+        if (archivo != nullptr) {
+            // Sí existe, cerrar el archivo y eliminarlo
+            fclose(archivo);
+            if (std::remove("archive.c") == 0) {
+                printf("El archivo %s ha sido eliminado.\n", "archive.c");
+            } else {
+                fprintf(stderr, "Error al intentar eliminar el archivo.\n");
+            }
+        }
+        // Si no existe, crearlo y escribir el contenido
+        archivo = fopen("archive.c", "w");
+        if (archivo != nullptr) {
+            fprintf(archivo, "%s\n", textoPostProcesado.c_str());
+            fclose(archivo);
+            printf("Se ha creado el archivo %s\n", "archive.c");
+        } else {
+            fprintf(stderr, "Error al intentar crear el archivo.\n");
+        }
+    }
+
 public:
     ProcesadorTexto() {
         basic_ifstream<char32_t> fin("data/stopwordsOrdened.txt");
@@ -93,10 +124,13 @@ public:
         cont = 0;
         while (cont < archive.size()) {
             c = archive[cont];
-            if(iswalpha(c)) {
-                identifyU32Word(archive);
-            } else if (is_in_u32string(c, U" \n\t\r") || is_in_u32string(textoProcesado[cont - 1], U" \n\t\r")) {
+            if(is_in_u32string(c,U"¿¡")) {
+                c = replaceSimbols(c);
+                textoProcesado += c;
                 cont++;
+            }
+            else if(iswalnum(c)) {
+                identifyU32Word(archive);
             } else {
                 textoProcesado += c;
                 cont++;
@@ -118,15 +152,21 @@ public:
         while (cont < textoProcesado.size()) {
             c = textoProcesado[cont];
 
-            if(is_in_u32string(c, U"áéíóúüñ")) {
+            if (is_in_u32string(c, U"\n\t\r ") && cont == 0)
+                cont++;
+            else if (is_in_u32string(c, U"áéíóúüñ")) {
                 string transform = quitarTilde(c);
                 textoPostProcesado += transform;
+                cont++;
+            } else if (is_in_u32string(c, U"\n\t\r ") && is_in_u32string(textoProcesado[cont - 1], U" \n\t\r")) {
+                cont++;
             } else {
                 c_transformed = (char) c;
                 textoPostProcesado += c_transformed;
+                cont++;
             }
-            cont++;
         }
+        crearArchivoProcesado();
         return textoPostProcesado;
     }
 };
