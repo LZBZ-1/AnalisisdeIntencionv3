@@ -5,6 +5,7 @@
 #include <fstream>
 #include "ProcesadorTexto.h"
 #include "Flex.h"
+#include "Bison.h"
 
 using namespace std;
 
@@ -54,6 +55,7 @@ void excecuteProgram() {
 int main() {
     ProcesadorTexto PC;
     Flex flex;
+    Bison bison;
     setlocale(LC_ALL, "es_ES.UTF-8");
     u32string archive = readFile("file.txt");
     u32string textoProcesado = PC.ProcesarTexto(archive);
@@ -65,6 +67,8 @@ int main() {
     cout << "-------------------------" << endl;
     cout << textoPostProcesado << endl;
     cout << "-------------------------" << endl;
+    bison.createBison();
+    bison.excecuteBison();
     flex.createFlex();
     flex.excecuteFlex();
     excecuteParser();

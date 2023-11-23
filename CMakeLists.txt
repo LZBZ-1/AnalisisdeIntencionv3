@@ -60,4 +60,5 @@ add_executable(AnalisisdeIntencionv3 main.cpp
         utils.h
         Flex.h
         Bison.h
+        AnalisisIntencion.h
 )
